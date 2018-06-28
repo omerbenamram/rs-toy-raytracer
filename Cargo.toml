@@ -1,0 +1,11 @@
+[package]
+name = "rs-raytracer"
+version = "0.1.0"
+authors = ["Omer Ben-Amram <omerbenamram@gmail.com>"]
+
+[dependencies]
+image = "*"
+num-traits = "0.2.5"
+num = "*"
+rand = "*"
+rayon = "1.0"
