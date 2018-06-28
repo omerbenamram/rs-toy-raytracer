@@ -38,16 +38,18 @@ impl Dielectric {
 impl Scatter for Dielectric {
     fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Vec3, Ray)> {
         let (outward_normal, ni_over_nt, cosine) = if r_in.direction.dot(&hit_record.normal) > 0.0 {
+            let outward_normal = &hit_record.normal * -1.0;
             (
-                hit_record.normal * -1.0,
+                outward_normal,
                 self.refraction_idx,
                 self.refraction_idx
                     * (&r_in.direction.dot(&hit_record.normal) / &r_in.direction.length()),
             )
         } else {
             // total refraction
+            let outward_normal = &hit_record.normal * -1.0;
             (
-                hit_record.normal,
+                outward_normal,
                 1.0 / self.refraction_idx,
                 -1.0 * (&r_in.direction.dot(&hit_record.normal) / &r_in.direction.length()),
             )
@@ -60,12 +62,12 @@ impl Scatter for Dielectric {
                 // Calculate chance for total internal refraction
                 let reflect_prob = Dielectric::schlick(cosine, self.refraction_idx);
                 match rand::random::<f64>() < reflect_prob {
-                    true => return Some((attenuation, Ray::new(hit_record.position, reflected))),
-                    false => return Some((attenuation, Ray::new(hit_record.position, refracted))),
+                    true => return Some((attenuation, Ray::new(hit_record.position.clone(), reflected))),
+                    false => return Some((attenuation, Ray::new(hit_record.position.clone(), refracted))),
                 }
             }
             // Reflect
-            None => return Some((attenuation, Ray::new(hit_record.position, reflected))),
+            None => return Some((attenuation, Ray::new(hit_record.position.clone(), reflected))),
         };
     }
 }

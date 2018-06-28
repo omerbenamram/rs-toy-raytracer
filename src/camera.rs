@@ -29,21 +29,22 @@ impl Camera {
         let v = w.cross(&u);
 
         Camera {
-            lower_left_corner: lookfrom
-                - &(u * half_width * focus_dist)
-                - &(v * half_height * focus_dist)
+            lower_left_corner: &lookfrom
+                - &(&u * half_width * focus_dist)
+                - &(&v * half_height * focus_dist)
                 - &(w * focus_dist),
-            horizontal: u * (half_width * 2.0 * focus_dist),
-            vertical: v * (half_height * 2.0 * focus_dist),
+            horizontal: (half_width * 2.0 * focus_dist) * &u,
+            vertical: &v * (half_height * 2.0 * focus_dist),
             origin: lookfrom,
             lens_radius: aperture / 2.0,
         }
     }
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         let orig = self.origin.clone();
+        let result = &self.lower_left_corner + &(&self.horizontal * u) + &(&self.vertical * v) - &orig;
         Ray::new(
             orig,
-            &self.lower_left_corner + &(self.horizontal * u) + &(self.vertical * v) - &orig,
+            result,
         )
     }
 }

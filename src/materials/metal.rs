@@ -24,7 +24,7 @@ impl Scatter for Metal {
     fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Vec3, Ray)> {
         let reflection = Metal::reflect(&r_in.direction.make_unit_vec(), &hit_record.normal);
         let scattered = Ray::new(
-            hit_record.position,
+            hit_record.position.clone(),
             reflection + random_in_unit_sphere() * self.fuzz,
         );
 

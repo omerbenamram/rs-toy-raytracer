@@ -6,7 +6,7 @@ use std::ops::AddAssign;
 use std::ops::DivAssign;
 use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
+#[derive(Clone, Debug, PartialOrd, PartialEq)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -40,7 +40,7 @@ impl Vec3 {
 
     pub fn make_unit_vec(&self) -> Vec3 {
         let k = 1.0 / self.length();
-        *self * k
+        self * k
     }
 
     pub fn origin() -> Vec3 {
@@ -234,6 +234,18 @@ impl Mul<Vec3> for Vec3 {
             x: self.x * rhs.x,
             y: self.y * rhs.y,
             z: self.z * rhs.z,
+        }
+    }
+}
+
+impl<'a, S: AsPrimitive<f64>> Mul<S> for &'a Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: S) -> Vec3 {
+        Vec3 {
+            x: self.x * rhs.as_(),
+            y: self.y * rhs.as_(),
+            z: self.z * rhs.as_(),
         }
     }
 }

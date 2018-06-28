@@ -1,10 +1,13 @@
+extern crate indicatif;
 extern crate rand;
 extern crate rayon;
 extern crate rs_raytracer;
 
-use std::f64;
+use indicatif::ProgressBar;
 use rayon::prelude::*;
+use std::f64;
 
+use indicatif::ProgressStyle;
 use rs_raytracer::camera::Camera;
 use rs_raytracer::hitable::Hitable;
 use rs_raytracer::hitable_list::HitableList;
@@ -54,36 +57,38 @@ fn generate_scene() -> HitableList {
                 b as f64 + 0.9 * rand::random::<f64>(),
             );
             let choose_mat = rand::random::<f64>();
-            if (center - &Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
-                world.hitables.push(Box::new(Sphere::new(
-                    center,
-                    0.2,
-                    Material::Lambertian(Lambertian::new(Vec3::new(
-                        rand::random(),
-                        rand::random(),
-                        rand::random(),
-                    ))),
-                )))
-            //metal
-            } else if choose_mat < 0.95 {
-                world.hitables.push(Box::new(Sphere::new(
-                    center,
-                    0.2,
-                    Material::Metal(Metal::new(
-                        Vec3::new(
-                            0.5 * (1.0 + rand::random::<f64>()),
-                            0.5 * (1.0 + rand::random::<f64>()),
-                            0.5 * (1.0 + rand::random::<f64>()),
-                        ),
-                        rand::random(),
-                    )),
-                )));
-            } else {
-                world.hitables.push(Box::new(Sphere::new(
-                    center,
-                    0.2,
-                    Material::Dielectric(Dielectric::new(1.5)),
-                )));
+            if (&center - &Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    world.hitables.push(Box::new(Sphere::new(
+                        center.clone(),
+                        0.2,
+                        Material::Lambertian(Lambertian::new(Vec3::new(
+                            rand::random(),
+                            rand::random(),
+                            rand::random(),
+                        ))),
+                    )))
+                //metal
+                } else if choose_mat < 0.95 {
+                    world.hitables.push(Box::new(Sphere::new(
+                        center.clone(),
+                        0.2,
+                        Material::Metal(Metal::new(
+                            Vec3::new(
+                                0.5 * (1.0 + rand::random::<f64>()),
+                                0.5 * (1.0 + rand::random::<f64>()),
+                                0.5 * (1.0 + rand::random::<f64>()),
+                            ),
+                            rand::random(),
+                        )),
+                    )));
+                } else {
+                    world.hitables.push(Box::new(Sphere::new(
+                        center.clone(),
+                        0.2,
+                        Material::Dielectric(Dielectric::new(1.5)),
+                    )));
+                }
             }
         }
     }
@@ -110,8 +115,8 @@ fn generate_scene() -> HitableList {
 }
 
 fn main() {
-    let nx = 400;
-    let ny = 200;
+    let nx: i32 = 400;
+    let ny: i32 = 200;
     let aa_ray_count = 100;
     println!("P3\n {} {}\n255", nx, ny);
 
@@ -131,13 +136,18 @@ fn main() {
     );
 
     let world = generate_scene();
+    let pbar = ProgressBar::new((ny * nx) as u64);
+
+    pbar.set_style(ProgressStyle::default_bar().template(
+        "[{elapsed} elapsed] {wide_bar:.cyan/white} {percent}% [{eta} remaining] [rendering]",
+    ));
 
     let result: Vec<Vec<(i64, i64, i64)>> = (0..ny)
         .into_par_iter()
         .map(|j: i32| {
             (0..nx)
                 .into_par_iter()
-                .map(|i| {
+                .map(|i: i32| {
                     let mut col = Vec3::new(0.0, 0.0, 0.0);
 
                     for _ in 0..aa_ray_count {
@@ -155,6 +165,7 @@ fn main() {
                     let ir = (255.99 * col.x) as i64;
                     let ig = (255.99 * col.y) as i64;
                     let ib = (255.99 * col.z) as i64;
+                    pbar.inc(1);
                     (ir, ig, ib)
                 })
                 .collect()
