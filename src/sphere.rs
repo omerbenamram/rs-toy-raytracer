@@ -27,7 +27,7 @@ impl Hitable for Sphere {
         let b = origin_center.dot(&ray.direction);
         let c = origin_center.dot(&origin_center) - self.radius * self.radius;
 
-        let discriminant = b * b - a * b;
+        let discriminant = b * b - a * c;
 
         // If any solutions
         if discriminant > 0.0 {
@@ -36,24 +36,14 @@ impl Hitable for Sphere {
             if (temp < t_max) && (temp > t_min) {
                 let p = ray.point_at_parameter(temp);
                 let normal = (&p - &self.center) / self.radius;
-                return Some(HitRecord::new(
-                    temp,
-                    p,
-                    normal,
-                    &self.material,
-                ));
+                return Some(HitRecord::new(temp, p, normal, &self.material));
             }
             // Check positive solution
             let temp = (-b + (b * b - a * c).sqrt()) / a;
             if (temp < t_max) && (temp > t_min) {
                 let p = ray.point_at_parameter(temp);
                 let normal = (&p - &self.center) / self.radius;
-                return Some(HitRecord::new(
-                    temp,
-                    p,
-                    normal,
-                    &self.material,
-                ));
+                return Some(HitRecord::new(temp, p, normal, &self.material));
             }
         }
         None
