@@ -47,7 +47,7 @@ impl Scatter for Dielectric {
             )
         } else {
             // total refraction
-            let outward_normal = &hit_record.normal * -1.0;
+            let outward_normal = hit_record.normal.clone();
             (
                 outward_normal,
                 1.0 / self.refraction_idx,
@@ -57,17 +57,33 @@ impl Scatter for Dielectric {
 
         let reflected = Dielectric::reflect(&r_in.direction, &hit_record.normal);
         let attenuation = Vec3::new(1.0, 1.0, 1.0);
+
         match Dielectric::refract(&r_in.direction, &outward_normal, ni_over_nt) {
             Some(refracted) => {
                 // Calculate chance for total internal refraction
                 let reflect_prob = Dielectric::schlick(cosine, self.refraction_idx);
                 match rand::random::<f64>() < reflect_prob {
-                    true => return Some((attenuation, Ray::new(hit_record.position.clone(), reflected))),
-                    false => return Some((attenuation, Ray::new(hit_record.position.clone(), refracted))),
+                    true => {
+                        return Some((
+                            attenuation,
+                            Ray::new(hit_record.position.clone(), reflected),
+                        ))
+                    }
+                    false => {
+                        return Some((
+                            attenuation,
+                            Ray::new(hit_record.position.clone(), refracted),
+                        ))
+                    }
                 }
             }
             // Reflect
-            None => return Some((attenuation, Ray::new(hit_record.position.clone(), reflected))),
+            None => {
+                return Some((
+                    attenuation,
+                    Ray::new(hit_record.position.clone(), reflected),
+                ))
+            }
         };
     }
 }
