@@ -1,8 +1,8 @@
-use hitable::HitRecord;
-use hitable::Hitable;
-use materials::Material;
-use ray::Ray;
-use vec3::Vec3;
+use crate::hitable::HitRecord;
+use crate::hitable::Hitable;
+use crate::materials::Material;
+use crate::ray::Ray;
+use crate::vec3::Vec3;
 
 pub struct Sphere {
     center: Vec3,

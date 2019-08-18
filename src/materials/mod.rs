@@ -2,12 +2,12 @@ pub mod dielectric;
 pub mod lambertian;
 pub mod metal;
 
-use hitable::HitRecord;
-use materials::dielectric::Dielectric;
-use materials::lambertian::Lambertian;
-use materials::metal::Metal;
-use ray::Ray;
-use vec3::Vec3;
+use crate::hitable::HitRecord;
+use crate::materials::dielectric::Dielectric;
+use crate::materials::lambertian::Lambertian;
+use crate::materials::metal::Metal;
+use crate::ray::Ray;
+use crate::vec3::Vec3;
 
 #[derive(Debug)]
 pub enum Material {

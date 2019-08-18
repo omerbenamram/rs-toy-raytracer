@@ -1,9 +1,9 @@
 extern crate rand;
 
-use hitable::HitRecord;
-use materials::Scatter;
-use ray::Ray;
-use vec3::Vec3;
+use crate::hitable::HitRecord;
+use crate::materials::Scatter;
+use crate::ray::Ray;
+use crate::vec3::Vec3;
 
 #[derive(Debug)]
 pub struct Dielectric {

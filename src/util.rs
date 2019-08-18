@@ -1,6 +1,6 @@
 extern crate rand;
 
-use vec3::Vec3;
+use crate::vec3::Vec3;
 
 pub fn random_in_unit_sphere() -> Vec3 {
     loop {

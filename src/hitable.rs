@@ -1,6 +1,6 @@
-use materials::Material;
-use ray::Ray;
-use vec3::Vec3;
+use crate::materials::Material;
+use crate::ray::Ray;
+use crate::vec3::Vec3;
 
 pub struct HitRecord<'a> {
     pub t: f64,

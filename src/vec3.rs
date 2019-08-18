@@ -1,7 +1,7 @@
 extern crate num;
 
 use num_traits::AsPrimitive;
-use std::collections::HashMap;
+
 use std::ops::AddAssign;
 use std::ops::DivAssign;
 use std::ops::{Add, Div, Mul, Sub};
@@ -262,8 +262,9 @@ impl<S: AsPrimitive<f64>> Mul<S> for Vec3 {
     }
 }
 
+#[cfg(test)]
 mod tests {
-    use super::Vec3;
+    use crate::vec3::Vec3;
 
     #[test]
     fn operations_dont_move_vec() {

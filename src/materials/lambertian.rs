@@ -1,8 +1,8 @@
-use hitable::HitRecord;
-use materials::Scatter;
-use ray::Ray;
-use util::random_in_unit_sphere;
-use vec3::Vec3;
+use crate::hitable::HitRecord;
+use crate::materials::Scatter;
+use crate::ray::Ray;
+use crate::util::random_in_unit_sphere;
+use crate::vec3::Vec3;
 
 #[derive(Debug)]
 pub struct Lambertian {
@@ -16,7 +16,7 @@ impl Lambertian {
 }
 
 impl Scatter for Lambertian {
-    fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Vec3, Ray)> {
+    fn scatter(&self, _r_in: &Ray, hit_record: &HitRecord) -> Option<(Vec3, Ray)> {
         let p = hit_record.position.clone();
         let target = &hit_record.position + &hit_record.normal + random_in_unit_sphere();
         let direction = target - &p;

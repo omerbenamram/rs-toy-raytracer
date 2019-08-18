@@ -1,6 +1,6 @@
-use ray::Ray;
+use crate::ray::Ray;
 use std::f64;
-use vec3::Vec3;
+use crate::vec3::Vec3;
 
 pub struct Camera {
     pub origin: Vec3,

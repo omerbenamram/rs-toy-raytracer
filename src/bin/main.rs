@@ -20,7 +20,7 @@ use rs_raytracer::ray::Ray;
 use rs_raytracer::sphere::Sphere;
 use rs_raytracer::vec3::Vec3;
 
-fn calculate_color(r: &Ray, world: &Hitable, depth: i32) -> Vec3 {
+fn calculate_color(r: &Ray, world: &dyn Hitable, depth: i32) -> Vec3 {
     match world.hit(r, 0.001, f64::MAX) {
         Some(hit) => match hit.material.scatter(r, &hit) {
             Some((albedo, scattered)) => {

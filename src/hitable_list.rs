@@ -1,9 +1,9 @@
-use hitable::HitRecord;
-use hitable::Hitable;
-use ray::Ray;
+use crate::hitable::HitRecord;
+use crate::hitable::Hitable;
+use crate::ray::Ray;
 
 pub struct HitableList {
-    pub hitables: Vec<Box<Hitable + Sync>>,
+    pub hitables: Vec<Box<dyn Hitable + Sync>>,
 }
 
 impl Hitable for HitableList {

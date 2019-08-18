@@ -1,8 +1,8 @@
-use hitable::HitRecord;
-use materials::Scatter;
-use ray::Ray;
-use util::random_in_unit_sphere;
-use vec3::Vec3;
+use crate::hitable::HitRecord;
+use crate::materials::Scatter;
+use crate::ray::Ray;
+use crate::util::random_in_unit_sphere;
+use crate::vec3::Vec3;
 
 #[derive(Debug)]
 pub struct Metal {

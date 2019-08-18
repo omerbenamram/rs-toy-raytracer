@@ -1,4 +1,3 @@
-#[allow(non_snake_case)]
 extern crate image;
 extern crate num_traits;
 
