@@ -1,7 +1,6 @@
 use crate::hitable::HitRecord;
 use crate::materials::Scatter;
 use crate::ray::Ray;
-use crate::util::random_in_unit_sphere;
 use crate::vec3::Vec3;
 
 #[derive(Debug)]
@@ -25,13 +24,13 @@ impl Scatter for Metal {
         let reflection = Metal::reflect(&r_in.direction.make_unit_vec(), &hit_record.normal);
         let scattered = Ray::new(
             hit_record.position.clone(),
-            reflection + random_in_unit_sphere() * self.fuzz,
+            reflection + Vec3::random_in_unit_sphere() * self.fuzz,
         );
 
         if scattered.direction.dot(&hit_record.normal) > 0.0 {
-            return Some((self.albedo.clone(), scattered));
+            Some((self.albedo.clone(), scattered))
         } else {
-            return None;
+            None
         }
     }
 }

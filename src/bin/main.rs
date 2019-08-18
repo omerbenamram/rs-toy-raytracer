@@ -27,15 +27,15 @@ fn calculate_color(r: &Ray, world: &dyn Hitable, depth: i32) -> Vec3 {
                 if depth < 50 {
                     return albedo * calculate_color(&scattered, world, depth + 1);
                 }
-                return Vec3::origin();
+                Vec3::origin()
             }
-            None => return Vec3::origin(),
+            None => Vec3::origin(),
         },
         None => {
             let unit_vec = r.direction.make_unit_vec();
             let t = (unit_vec.y + 1.0) / 2.0;
 
-            return Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t;
+            Vec3::new(1.0, 1.0, 1.0) * (1.0 - t) + Vec3::new(0.5, 0.7, 1.0) * t
         }
     }
 }
@@ -151,15 +151,15 @@ fn main() {
                     let mut col = Vec3::new(0.0, 0.0, 0.0);
 
                     for _ in 0..aa_ray_count {
-                        let u: f64 = (i as f64 + rand::random::<f64>()) as f64 / nx as f64;
-                        let v: f64 = (j as f64 + rand::random::<f64>()) as f64 / ny as f64;
+                        let u: f64 = (f64::from(i) + rand::random::<f64>()) as f64 / f64::from(nx);
+                        let v: f64 = (f64::from(j) + rand::random::<f64>()) as f64 / f64::from(ny);
 
                         let r = cam.get_ray(u, v);
 
                         col += &calculate_color(&r, &world, 0);
                     }
 
-                    col /= aa_ray_count as f64;
+                    col /= f64::from(aa_ray_count);
                     col = Vec3::new(col.x.sqrt(), col.y.sqrt(), col.z.sqrt());
 
                     let ir = (255.99 * col.x) as i64;

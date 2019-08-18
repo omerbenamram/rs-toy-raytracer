@@ -1,6 +1,3 @@
-extern crate image;
-extern crate num_traits;
-
 pub mod camera;
 pub mod hitable;
 pub mod hitable_list;
