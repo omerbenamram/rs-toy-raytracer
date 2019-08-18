@@ -14,8 +14,9 @@ impl Dielectric {
     pub fn new(refraction_idx: f64) -> Dielectric {
         Dielectric { refraction_idx }
     }
+
     fn reflect(v: &Vec3, normal: &Vec3) -> Vec3 {
-        v - &(v.dot(normal) * 2.0 * normal)
+        v - (v.dot(normal) * normal * 2.0)
     }
 
     fn refract(v: &Vec3, normal: &Vec3, ni_over_nt: f64) -> Option<Vec3> {
@@ -23,7 +24,7 @@ impl Dielectric {
         let dt = uv.dot(normal);
         let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
         if discriminant > 0.0 {
-            return Some((uv - &(dt * normal)) * ni_over_nt - &(discriminant.sqrt() * normal));
+            return Some((uv - (normal * dt)) * ni_over_nt - (discriminant.sqrt() * normal));
         }
         None
     }

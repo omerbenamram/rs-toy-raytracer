@@ -1,8 +1,3 @@
-extern crate indicatif;
-extern crate rand;
-extern crate rayon;
-extern crate rs_raytracer;
-
 use indicatif::ProgressBar;
 use rayon::prelude::*;
 use std::f64;
@@ -52,15 +47,15 @@ fn generate_scene() -> HitableList {
     for a in -11..11 {
         for b in -11..11 {
             let center = Vec3::new(
-                a as f64 + 0.9 * rand::random::<f64>(),
+                f64::from(a) + 0.9 * rand::random::<f64>(),
                 0.2,
-                b as f64 + 0.9 * rand::random::<f64>(),
+                f64::from(b) + 0.9 * rand::random::<f64>(),
             );
             let choose_mat = rand::random::<f64>();
-            if (&center - &Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     world.hitables.push(Box::new(Sphere::new(
-                        center.clone(),
+                        center,
                         0.2,
                         Material::Lambertian(Lambertian::new(Vec3::new(
                             rand::random(),
@@ -71,7 +66,7 @@ fn generate_scene() -> HitableList {
                 //metal
                 } else if choose_mat < 0.95 {
                     world.hitables.push(Box::new(Sphere::new(
-                        center.clone(),
+                        center,
                         0.2,
                         Material::Metal(Metal::new(
                             Vec3::new(
@@ -84,7 +79,7 @@ fn generate_scene() -> HitableList {
                     )));
                 } else {
                     world.hitables.push(Box::new(Sphere::new(
-                        center.clone(),
+                        center,
                         0.2,
                         Material::Dielectric(Dielectric::new(1.5)),
                     )));
@@ -118,7 +113,6 @@ fn main() {
     let nx: i32 = 400;
     let ny: i32 = 200;
     let aa_ray_count = 100;
-    println!("P3\n {} {}\n255", nx, ny);
 
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
     let lookat = Vec3::new(0.0, 0.0, 0.0);
@@ -130,7 +124,7 @@ fn main() {
         lookat,
         Vec3::new(0.0, 1.0, 0.0),
         20.0,
-        nx as f64 / ny as f64,
+        f64::from(nx) / f64::from(ny),
         aperture,
         dist_to_focus,
     );
@@ -156,7 +150,7 @@ fn main() {
 
                         let r = cam.get_ray(u, v);
 
-                        col += &calculate_color(&r, &world, 0);
+                        col += calculate_color(&r, &world, 0);
                     }
 
                     col /= f64::from(aa_ray_count);
@@ -172,9 +166,17 @@ fn main() {
         })
         .collect();
 
-    for row in result.iter().rev() {
-        for pix in row {
-            println!("{} {} {}", pix.0, pix.1, pix.2)
+    let mut imgbuf = image::ImageBuffer::new(nx as u32, ny as u32);
+
+    for (r, row) in result.iter().rev().zip(imgbuf.rows_mut()) {
+        for (pixel_result, pix) in r.iter().zip(row) {
+            *pix = image::Rgb([
+                pixel_result.0 as u8,
+                pixel_result.1 as u8,
+                pixel_result.2 as u8,
+            ]);
         }
     }
+
+    imgbuf.save("test.png").unwrap();
 }

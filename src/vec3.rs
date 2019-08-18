@@ -6,7 +6,7 @@ use std::ops::AddAssign;
 use std::ops::DivAssign;
 use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Clone, Debug, PartialOrd, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialOrd, PartialEq)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -53,13 +53,43 @@ impl Vec3 {
 
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
-            let p = Vec3::new(rand::random(), rand::random(), rand::random()) * 2
-                - &Vec3::new(1.0, 1.0, 1.0);
+            let p = Vec3::new(rand::random(), rand::random(), rand::random()) * 2.0
+                - Vec3::new(1.0, 1.0, 1.0);
             if p.squared_length() < 1.0 {
                 return p;
             }
         }
     }
+}
+
+macro_rules! forward_ref_binop {
+    (impl $imp:ident, $method:ident for $t:ty, $u:ty) => {
+        impl<'a> $imp<$u> for &'a $t {
+            type Output = <$t as $imp<$u>>::Output;
+
+            #[inline]
+            fn $method(self, other: $u) -> <$t as $imp<$u>>::Output {
+                $imp::$method(*self, other)
+            }
+        }
+
+        impl<'a> $imp<&'a $u> for $t {
+            type Output = <$t as $imp<$u>>::Output;
+
+            #[inline]
+            fn $method(self, other: &'a $u) -> <$t as $imp<$u>>::Output {
+                $imp::$method(self, *other)
+            }
+        }
+        impl<'a, 'b> $imp<&'a $u> for &'b $t {
+            type Output = <$t as $imp<$u>>::Output;
+
+            #[inline]
+            fn $method(self, other: &'a $u) -> <$t as $imp<$u>>::Output {
+                $imp::$method(*self, *other)
+            }
+        }
+    };
 }
 
 impl Add for Vec3 {
@@ -74,6 +104,8 @@ impl Add for Vec3 {
     }
 }
 
+forward_ref_binop!(impl Add, add for Vec3, Vec3);
+
 impl<S: AsPrimitive<f64>> Add<S> for Vec3 {
     type Output = Vec3;
 
@@ -86,42 +118,18 @@ impl<S: AsPrimitive<f64>> Add<S> for Vec3 {
     }
 }
 
-impl<'a> Add<&'a Vec3> for Vec3 {
-    type Output = Vec3;
-
-    fn add(self, rhs: &'a Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-            z: self.z + rhs.z,
-        }
-    }
-}
-
-impl<'a> AddAssign<&'a Vec3> for Vec3 {
-    fn add_assign(&mut self, rhs: &Vec3) {
+impl AddAssign<Vec3> for Vec3 {
+    fn add_assign(&mut self, rhs: Vec3) {
         self.x += rhs.x;
         self.y += rhs.y;
         self.z += rhs.z;
     }
 }
 
-impl<'a> Add<&'a Vec3> for &'a Vec3 {
+impl Sub<Vec3> for Vec3 {
     type Output = Vec3;
 
-    fn add(self, rhs: &'a Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-            z: self.z + rhs.z,
-        }
-    }
-}
-
-impl<'a> Sub<&'a Vec3> for Vec3 {
-    type Output = Vec3;
-
-    fn sub(self, rhs: &'a Vec3) -> Vec3 {
+    fn sub(self, rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
@@ -130,17 +138,7 @@ impl<'a> Sub<&'a Vec3> for Vec3 {
     }
 }
 
-impl<'a> Sub<&'a Vec3> for &'a Vec3 {
-    type Output = Vec3;
-
-    fn sub(self, rhs: &'a Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-            z: self.z - rhs.z,
-        }
-    }
-}
+forward_ref_binop!(impl Sub, sub for Vec3, Vec3);
 
 impl Div for Vec3 {
     type Output = Vec3;
@@ -154,13 +152,21 @@ impl Div for Vec3 {
     }
 }
 
-impl<'a> DivAssign<&'a Vec3> for Vec3 {
-    fn div_assign(&mut self, rhs: &Vec3) {
-        self.x /= rhs.x;
-        self.y /= rhs.y;
-        self.z /= rhs.z;
+forward_ref_binop!(impl Div, div for Vec3, Vec3);
+
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: Vec3) -> Vec3 {
+        Vec3 {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
+        }
     }
 }
+
+forward_ref_binop!(impl Mul, mul for Vec3, Vec3);
 
 impl<S: AsPrimitive<f64>> DivAssign<S> for Vec3 {
     fn div_assign(&mut self, rhs: S) {
@@ -194,22 +200,34 @@ impl<S: AsPrimitive<f64>> Div<S> for Vec3 {
     }
 }
 
-impl<'a> Mul<&'a Vec3> for Vec3 {
+//impl<'a, S: AsPrimitive<f64>> Mul<S> for Vec3 {
+//    type Output = Vec3;
+//
+//    fn mul(self, rhs: S) -> Vec3 {
+//        Vec3 {
+//            x: self.x * rhs.as_(),
+//            y: self.y * rhs.as_(),
+//            z: self.z * rhs.as_(),
+//        }
+//    }
+//}
+
+impl Mul<f64> for Vec3 {
     type Output = Vec3;
 
-    fn mul(self, rhs: &'a Vec3) -> Vec3 {
+    fn mul(self, rhs: f64) -> Vec3 {
         Vec3 {
-            x: self.x * rhs.x,
-            y: self.y * rhs.y,
-            z: self.z * rhs.z,
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
         }
     }
 }
 
-impl<'a> Mul<&'a Vec3> for f64 {
+impl Mul<Vec3> for f64 {
     type Output = Vec3;
 
-    fn mul(self, rhs: &'a Vec3) -> Vec3 {
+    fn mul(self, rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self * rhs.x,
             y: self * rhs.y,
@@ -218,53 +236,8 @@ impl<'a> Mul<&'a Vec3> for f64 {
     }
 }
 
-impl<'a> Mul<&'a Vec3> for &'a Vec3 {
-    type Output = Vec3;
-
-    fn mul(self, rhs: &'a Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x * rhs.x,
-            y: self.y * rhs.y,
-            z: self.z * rhs.z,
-        }
-    }
-}
-
-impl Mul<Vec3> for Vec3 {
-    type Output = Vec3;
-
-    fn mul(self, rhs: Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x * rhs.x,
-            y: self.y * rhs.y,
-            z: self.z * rhs.z,
-        }
-    }
-}
-
-impl<'a, S: AsPrimitive<f64>> Mul<S> for &'a Vec3 {
-    type Output = Vec3;
-
-    fn mul(self, rhs: S) -> Vec3 {
-        Vec3 {
-            x: self.x * rhs.as_(),
-            y: self.y * rhs.as_(),
-            z: self.z * rhs.as_(),
-        }
-    }
-}
-
-impl<S: AsPrimitive<f64>> Mul<S> for Vec3 {
-    type Output = Vec3;
-
-    fn mul(self, rhs: S) -> Vec3 {
-        Vec3 {
-            x: self.x * rhs.as_(),
-            y: self.y * rhs.as_(),
-            z: self.z * rhs.as_(),
-        }
-    }
-}
+forward_ref_binop!(impl Mul, mul for f64, Vec3);
+forward_ref_binop!(impl Mul, mul for Vec3, f64);
 
 #[cfg(test)]
 mod tests {
