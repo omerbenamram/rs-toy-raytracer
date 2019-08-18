@@ -2,3 +2,5 @@
 **/*.rs.bk
 *.ppm
 .idea
+*.png
+*.ppm

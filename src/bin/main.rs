@@ -2,6 +2,7 @@ use indicatif::ProgressBar;
 use rayon::prelude::*;
 use std::f64;
 
+use clap::{App, Arg};
 use indicatif::ProgressStyle;
 use rs_raytracer::camera::Camera;
 use rs_raytracer::hitable::Hitable;
@@ -110,9 +111,42 @@ fn generate_scene() -> HitableList {
 }
 
 fn main() {
-    let nx: i32 = 400;
-    let ny: i32 = 200;
-    let aa_ray_count = 100;
+    let app = App::new("Raytracer").args(&[
+        Arg::with_name("x").required(true),
+        Arg::with_name("y").required(true),
+        Arg::with_name("aa")
+            .required(false)
+            .default_value("100")
+            .help("Number of anti-aliasing rays"),
+        Arg::with_name("dist-to-focus")
+            .required(false)
+            .help("Distance to focus"),
+        Arg::with_name("output")
+            .required(false)
+            .default_value("output.png")
+            .short("o")
+            .help("Output path, defaults to `output.png`"),
+    ]);
+
+    let matches = app.get_matches();
+
+    let nx: i32 = matches
+        .value_of("x")
+        .expect("a required argument")
+        .parse()
+        .expect("x should be a number");
+
+    let ny: i32 = matches
+        .value_of("y")
+        .expect("a required argument")
+        .parse()
+        .expect("y should be a number");
+
+    let aa_ray_count = matches
+        .value_of("aa")
+        .expect("has a default")
+        .parse()
+        .expect("number of aa rays should be a number");
 
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
     let lookat = Vec3::new(0.0, 0.0, 0.0);
@@ -178,5 +212,9 @@ fn main() {
         }
     }
 
-    imgbuf.save("test.png").unwrap();
+    let output_path = matches.value_of("output").expect("has a default value");
+
+    imgbuf
+        .save(output_path)
+        .expect("failed to write to output path.");
 }
