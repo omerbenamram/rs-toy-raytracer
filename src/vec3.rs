@@ -95,6 +95,7 @@ macro_rules! forward_ref_binop {
 impl Add for Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn add(self, rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self.x + rhs.x,
@@ -109,6 +110,7 @@ forward_ref_binop!(impl Add, add for Vec3, Vec3);
 impl<S: AsPrimitive<f64>> Add<S> for Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn add(self, rhs: S) -> Vec3 {
         Vec3 {
             x: self.x + rhs.as_(),
@@ -119,6 +121,7 @@ impl<S: AsPrimitive<f64>> Add<S> for Vec3 {
 }
 
 impl AddAssign<Vec3> for Vec3 {
+    #[inline]
     fn add_assign(&mut self, rhs: Vec3) {
         self.x += rhs.x;
         self.y += rhs.y;
@@ -129,6 +132,7 @@ impl AddAssign<Vec3> for Vec3 {
 impl Sub<Vec3> for Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn sub(self, rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self.x - rhs.x,
@@ -143,6 +147,7 @@ forward_ref_binop!(impl Sub, sub for Vec3, Vec3);
 impl Div for Vec3 {
     type Output = Vec3;
 
+    #[inline(always)]
     fn div(self, rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self.x / rhs.x,
@@ -157,6 +162,7 @@ forward_ref_binop!(impl Div, div for Vec3, Vec3);
 impl Mul<Vec3> for Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self.x * rhs.x,
@@ -169,6 +175,7 @@ impl Mul<Vec3> for Vec3 {
 forward_ref_binop!(impl Mul, mul for Vec3, Vec3);
 
 impl<S: AsPrimitive<f64>> DivAssign<S> for Vec3 {
+    #[inline]
     fn div_assign(&mut self, rhs: S) {
         self.x /= rhs.as_();
         self.y /= rhs.as_();
@@ -179,6 +186,7 @@ impl<S: AsPrimitive<f64>> DivAssign<S> for Vec3 {
 impl Div<Vec3> for f64 {
     type Output = Vec3;
 
+    #[inline]
     fn div(self, rhs: Vec3) -> <Self as Div<Vec3>>::Output {
         Vec3 {
             x: self / rhs.x,
@@ -191,6 +199,7 @@ impl Div<Vec3> for f64 {
 impl<S: AsPrimitive<f64>> Div<S> for Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn div(self, rhs: S) -> Vec3 {
         Vec3 {
             x: self.x / rhs.as_(),
@@ -203,6 +212,7 @@ impl<S: AsPrimitive<f64>> Div<S> for Vec3 {
 impl Mul<f64> for Vec3 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, rhs: f64) -> Vec3 {
         Vec3 {
             x: self.x * rhs,
@@ -215,6 +225,7 @@ impl Mul<f64> for Vec3 {
 impl Mul<Vec3> for f64 {
     type Output = Vec3;
 
+    #[inline]
     fn mul(self, rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self * rhs.x,
