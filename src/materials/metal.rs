@@ -14,20 +14,20 @@ impl Metal {
         let fuzz = if fuzz < 1.0 { fuzz } else { 1.0 };
         Metal { albedo, fuzz }
     }
-    fn reflect(v: &Vec3, normal: &Vec3) -> Vec3 {
-        v - &(v.dot(normal) * 2.0 * normal)
+    fn reflect(v: Vec3, normal: Vec3) -> Vec3 {
+        v - (v.dot(normal) * 2.0 * normal)
     }
 }
 
 impl Scatter for Metal {
     fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Vec3, Ray)> {
-        let reflection = Metal::reflect(&r_in.direction.make_unit_vec(), &hit_record.normal);
+        let reflection = Metal::reflect(r_in.direction.make_unit_vec(), hit_record.normal);
         let scattered = Ray::new(
             hit_record.position.clone(),
             reflection + Vec3::random_in_unit_sphere() * self.fuzz,
         );
 
-        if scattered.direction.dot(&hit_record.normal) > 0.0 {
+        if scattered.direction.dot(hit_record.normal) > 0.0 {
             Some((self.albedo.clone(), scattered))
         } else {
             None

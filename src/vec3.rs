@@ -18,11 +18,11 @@ impl Vec3 {
         Vec3 { x, y, z }
     }
 
-    pub fn dot(&self, other: &Vec3) -> f64 {
+    pub fn dot(&self, other: Vec3) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    pub fn cross(&self, other: &Vec3) -> Vec3 {
+    pub fn cross(&self, other: Vec3) -> Vec3 {
         Vec3 {
             x: self.y * other.z - self.z * other.y,
             y: -(self.x * other.z - self.z * other.x),
@@ -200,18 +200,6 @@ impl<S: AsPrimitive<f64>> Div<S> for Vec3 {
     }
 }
 
-//impl<'a, S: AsPrimitive<f64>> Mul<S> for Vec3 {
-//    type Output = Vec3;
-//
-//    fn mul(self, rhs: S) -> Vec3 {
-//        Vec3 {
-//            x: self.x * rhs.as_(),
-//            y: self.y * rhs.as_(),
-//            z: self.z * rhs.as_(),
-//        }
-//    }
-//}
-
 impl Mul<f64> for Vec3 {
     type Output = Vec3;
 
@@ -316,9 +304,9 @@ mod tests {
         assert_eq!(
             a.make_unit_vec(),
             Vec3 {
-                x: 0.2672612419124244,
-                y: 0.5345224838248488,
-                z: 0.8017837257372732,
+                x: 0.267_261_241_912_424_4,
+                y: 0.534_522_483_824_848_8,
+                z: 0.801_783_725_737_273_2,
             }
         )
     }
