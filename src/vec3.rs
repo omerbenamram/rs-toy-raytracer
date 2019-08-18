@@ -38,7 +38,7 @@ impl Vec3 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    pub fn make_unit_vec(&self) -> Vec3 {
+    pub fn make_unit_vec(self) -> Vec3 {
         let k = 1.0 / self.length();
         self * k
     }
@@ -53,7 +53,7 @@ impl Vec3 {
 
     pub fn random_in_unit_sphere() -> Vec3 {
         loop {
-            let p = Vec3::new(rand::random(), rand::random(), rand::random()) * 2.0
+            let p = Vec3::new(rand::random(), rand::random(), rand::random()) * 2
                 - Vec3::new(1.0, 1.0, 1.0);
             if p.squared_length() < 1.0 {
                 return p;
@@ -209,15 +209,15 @@ impl<S: AsPrimitive<f64>> Div<S> for Vec3 {
     }
 }
 
-impl Mul<f64> for Vec3 {
+impl<S: AsPrimitive<f64>> Mul<S> for Vec3 {
     type Output = Vec3;
 
     #[inline]
-    fn mul(self, rhs: f64) -> Vec3 {
+    fn mul(self, rhs: S) -> Vec3 {
         Vec3 {
-            x: self.x * rhs,
-            y: self.y * rhs,
-            z: self.z * rhs,
+            x: self.x * rhs.as_(),
+            y: self.y * rhs.as_(),
+            z: self.z * rhs.as_(),
         }
     }
 }
@@ -234,9 +234,6 @@ impl Mul<Vec3> for f64 {
         }
     }
 }
-
-forward_ref_binop!(impl Mul, mul for f64, Vec3);
-forward_ref_binop!(impl Mul, mul for Vec3, f64);
 
 #[cfg(test)]
 mod tests {
@@ -256,8 +253,8 @@ mod tests {
             z: 3.0,
         };
 
-        let u = &a + &b;
-        let z = &a + &b;
+        let u = a + b;
+        let z = a + b;
 
         assert_eq!(u, z);
     }
@@ -295,7 +292,7 @@ mod tests {
         };
 
         assert_eq!(
-            a * &b,
+            a * b,
             Vec3 {
                 x: 1.0,
                 y: 4.0,

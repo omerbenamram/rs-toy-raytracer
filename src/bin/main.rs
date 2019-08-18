@@ -5,8 +5,7 @@ use std::f64;
 use clap::{App, Arg};
 use indicatif::ProgressStyle;
 use rs_raytracer::camera::Camera;
-use rs_raytracer::hitable::Hitable;
-use rs_raytracer::hitable_list::HitableList;
+use rs_raytracer::hitable::{Hitable, HitableList};
 use rs_raytracer::materials::dielectric::Dielectric;
 use rs_raytracer::materials::lambertian::Lambertian;
 use rs_raytracer::materials::metal::Metal;
@@ -37,9 +36,9 @@ fn calculate_color(r: &Ray, world: &dyn Hitable, depth: i32) -> Vec3 {
 }
 
 fn generate_scene() -> HitableList {
-    let mut world = HitableList { hitables: vec![] };
+    let mut world = HitableList::new();
 
-    world.hitables.push(Box::new(Sphere::new(
+    world.push(Box::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
         Material::Lambertian(Lambertian::new(Vec3::new(0.5, 0.5, 0.5))),
@@ -55,7 +54,7 @@ fn generate_scene() -> HitableList {
             let choose_mat = rand::random::<f64>();
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
-                    world.hitables.push(Box::new(Sphere::new(
+                    world.push(Box::new(Sphere::new(
                         center,
                         0.2,
                         Material::Lambertian(Lambertian::new(Vec3::new(
@@ -66,7 +65,7 @@ fn generate_scene() -> HitableList {
                     )))
                 //metal
                 } else if choose_mat < 0.95 {
-                    world.hitables.push(Box::new(Sphere::new(
+                    world.push(Box::new(Sphere::new(
                         center,
                         0.2,
                         Material::Metal(Metal::new(
@@ -79,7 +78,7 @@ fn generate_scene() -> HitableList {
                         )),
                     )));
                 } else {
-                    world.hitables.push(Box::new(Sphere::new(
+                    world.push(Box::new(Sphere::new(
                         center,
                         0.2,
                         Material::Dielectric(Dielectric::new(1.5)),
@@ -89,19 +88,19 @@ fn generate_scene() -> HitableList {
         }
     }
 
-    world.hitables.push(Box::new(Sphere::new(
+    world.push(Box::new(Sphere::new(
         Vec3::new(0.0, 1.0, 0.0),
         1.0,
         Material::Dielectric(Dielectric::new(1.5)),
     )));
 
-    world.hitables.push(Box::new(Sphere::new(
+    world.push(Box::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
         Material::Lambertian(Lambertian::new(Vec3::new(0.4, 0.2, 0.1))),
     )));
 
-    world.hitables.push(Box::new(Sphere::new(
+    world.push(Box::new(Sphere::new(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
         Material::Metal(Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0)),
