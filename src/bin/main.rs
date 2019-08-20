@@ -12,7 +12,6 @@ use rs_raytracer::materials::metal::Metal;
 use rs_raytracer::ray::Ray;
 use rs_raytracer::sphere::Sphere;
 use rs_raytracer::vec3::Vec3;
-use std::sync::{Arc, Mutex};
 
 fn calculate_color(r: &Ray, world: &dyn Hitable, depth: i32) -> Vec3 {
     match world.hit(r, 0.001, f64::MAX) {
@@ -37,10 +36,10 @@ fn calculate_color(r: &Ray, world: &dyn Hitable, depth: i32) -> Vec3 {
 fn generate_scene() -> HitableList {
     let mut world = HitableList::new();
 
-    world.push(Arc::new(Sphere::new(
+    world.push(Box::new(Sphere::new(
         Vec3::new(0.0, -1000.0, 0.0),
         1000.0,
-        Arc::new(Lambertian::new(Vec3::new(0.5, 0.5, 0.5))),
+        Box::new(Lambertian::new(Vec3::new(0.5, 0.5, 0.5))),
     )));
 
     for a in -11..11 {
@@ -53,10 +52,10 @@ fn generate_scene() -> HitableList {
             let choose_mat = rand::random::<f64>();
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
-                    world.push(Arc::new(Sphere::new(
+                    world.push(Box::new(Sphere::new(
                         center,
                         0.2,
-                        Arc::new(Lambertian::new(Vec3::new(
+                        Box::new(Lambertian::new(Vec3::new(
                             rand::random(),
                             rand::random(),
                             rand::random(),
@@ -64,10 +63,10 @@ fn generate_scene() -> HitableList {
                     )))
                 //metal
                 } else if choose_mat < 0.95 {
-                    world.push(Arc::new(Sphere::new(
+                    world.push(Box::new(Sphere::new(
                         center,
                         0.2,
-                        Arc::new(Metal::new(
+                        Box::new(Metal::new(
                             Vec3::new(
                                 0.5 * (1.0 + rand::random::<f64>()),
                                 0.5 * (1.0 + rand::random::<f64>()),
@@ -77,32 +76,32 @@ fn generate_scene() -> HitableList {
                         )),
                     )));
                 } else {
-                    world.push(Arc::new(Sphere::new(
+                    world.push(Box::new(Sphere::new(
                         center,
                         0.2,
-                        Arc::new(Dielectric::new(1.5)),
+                        Box::new(Dielectric::new(1.5)),
                     )));
                 }
             }
         }
     }
 
-    world.push(Arc::new(Sphere::new(
+    world.push(Box::new(Sphere::new(
         Vec3::new(0.0, 1.0, 0.0),
         1.0,
-        Arc::new(Dielectric::new(1.5)),
+        Box::new(Dielectric::new(1.5)),
     )));
 
-    world.push(Arc::new(Sphere::new(
+    world.push(Box::new(Sphere::new(
         Vec3::new(-4.0, 1.0, 0.0),
         1.0,
-        Arc::new(Lambertian::new(Vec3::new(0.4, 0.2, 0.1))),
+        Box::new(Lambertian::new(Vec3::new(0.4, 0.2, 0.1))),
     )));
 
-    world.push(Arc::new(Sphere::new(
+    world.push(Box::new(Sphere::new(
         Vec3::new(4.0, 1.0, 0.0),
         1.0,
-        Arc::new(Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0)),
+        Box::new(Metal::new(Vec3::new(0.7, 0.6, 0.5), 0.0)),
     )));
 
     world
