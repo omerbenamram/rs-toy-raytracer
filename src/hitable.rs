@@ -6,16 +6,11 @@ pub struct HitRecord<'a> {
     pub t: f64,
     pub position: Vec3,
     pub normal: Vec3,
-    pub material: &'a (dyn Material + Send + Sync),
+    pub material: &'a (dyn Material),
 }
 
 impl<'a> HitRecord<'a> {
-    pub fn new(
-        t: f64,
-        position: Vec3,
-        normal: Vec3,
-        material: &'a (dyn Material + Send + Sync),
-    ) -> HitRecord {
+    pub fn new(t: f64, position: Vec3, normal: Vec3, material: &'a (dyn Material)) -> HitRecord {
         HitRecord {
             t,
             position,
@@ -25,7 +20,7 @@ impl<'a> HitRecord<'a> {
     }
 }
 
-pub type HitableList = Vec<Box<dyn Hitable + Sync + Send>>;
+pub type HitableList = Vec<Box<dyn Hitable>>;
 
 impl Hitable for HitableList {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -46,6 +41,6 @@ impl Hitable for HitableList {
     }
 }
 
-pub trait Hitable {
+pub trait Hitable: Send + Sync {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
