@@ -1,16 +1,22 @@
 use crate::materials::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
+use std::sync::{Arc, Mutex};
 
-pub struct HitRecord<'a> {
+pub struct HitRecord {
     pub t: f64,
     pub position: Vec3,
     pub normal: Vec3,
-    pub material: &'a Material,
+    pub material: Arc<dyn Material + Send + Sync>,
 }
 
-impl<'a> HitRecord<'a> {
-    pub fn new(t: f64, position: Vec3, normal: Vec3, material: &'a Material) -> HitRecord {
+impl HitRecord {
+    pub fn new(
+        t: f64,
+        position: Vec3,
+        normal: Vec3,
+        material: Arc<dyn Material + Send + Sync>,
+    ) -> HitRecord {
         HitRecord {
             t,
             position,
@@ -20,7 +26,7 @@ impl<'a> HitRecord<'a> {
     }
 }
 
-pub type HitableList = Vec<Box<dyn Hitable + Sync>>;
+pub type HitableList = Vec<Arc<dyn Hitable + Sync + Send>>;
 
 impl Hitable for HitableList {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {

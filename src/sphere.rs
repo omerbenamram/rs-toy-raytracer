@@ -3,15 +3,16 @@ use crate::hitable::Hitable;
 use crate::materials::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
+use std::sync::{Arc, Mutex};
 
 pub struct Sphere {
     center: Vec3,
     radius: f64,
-    material: Material,
+    material: Arc<dyn Material + Send + Sync>,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f64, material: Material) -> Sphere {
+    pub fn new(center: Vec3, radius: f64, material: Arc<dyn Material + Send + Sync>) -> Sphere {
         Sphere {
             center,
             radius,
@@ -36,14 +37,14 @@ impl Hitable for Sphere {
             if (temp < t_max) && (temp > t_min) {
                 let p = ray.point_at_parameter(temp);
                 let normal = (p - self.center) / self.radius;
-                return Some(HitRecord::new(temp, p, normal, &self.material));
+                return Some(HitRecord::new(temp, p, normal, self.material.clone()));
             }
             // Check positive solution
             let temp = (-b + (b * b - a * c).sqrt()) / a;
             if (temp < t_max) && (temp > t_min) {
                 let p = ray.point_at_parameter(temp);
                 let normal = (p - self.center) / self.radius;
-                return Some(HitRecord::new(temp, p, normal, &self.material));
+                return Some(HitRecord::new(temp, p, normal, self.material.clone()));
             }
         }
         None

@@ -1,5 +1,5 @@
 use crate::hitable::HitRecord;
-use crate::materials::Scatter;
+use crate::materials::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
@@ -34,7 +34,7 @@ impl Dielectric {
     }
 }
 
-impl Scatter for Dielectric {
+impl Material for Dielectric {
     fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Vec3, Ray)> {
         let (outward_normal, ni_over_nt, cosine) = if r_in.direction.dot(hit_record.normal) > 0.0 {
             let outward_normal = hit_record.normal * -1.0;

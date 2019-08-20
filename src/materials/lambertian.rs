@@ -1,5 +1,5 @@
 use crate::hitable::HitRecord;
-use crate::materials::Scatter;
+use crate::materials::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
@@ -14,7 +14,7 @@ impl Lambertian {
     }
 }
 
-impl Scatter for Lambertian {
+impl Material for Lambertian {
     fn scatter(&self, _r_in: &Ray, hit_record: &HitRecord) -> Option<(Vec3, Ray)> {
         let p = hit_record.position;
         let target = hit_record.position + hit_record.normal + Vec3::random_in_unit_sphere();

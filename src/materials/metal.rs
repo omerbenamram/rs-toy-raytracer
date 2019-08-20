@@ -1,5 +1,5 @@
 use crate::hitable::HitRecord;
-use crate::materials::Scatter;
+use crate::materials::Material;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
@@ -19,7 +19,7 @@ impl Metal {
     }
 }
 
-impl Scatter for Metal {
+impl Material for Metal {
     fn scatter(&self, r_in: &Ray, hit_record: &HitRecord) -> Option<(Vec3, Ray)> {
         let reflection = Metal::reflect(r_in.direction.make_unit_vec(), hit_record.normal);
         let scattered = Ray::new(
